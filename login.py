@@ -43,24 +43,24 @@ def generate_captcha():
 # Signup function
 def signup():
     st.header("Sign Up")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+    email = st.text_input("Email", key="signup_email")
+    password = st.text_input("Password", type="password", key="signup_password")
     if st.button("Sign Up"):
         if email and password:
             user = {"email": email, "password": password}
             users_collection.insert_one(user)
             st.session_state.logged_in = True
             st.session_state.email = email
-            st.experimental_set_query_params(page="news")  # Redirect to news page
-            st.experimental_rerun()
+            st.success("Sign-up successful!")
+            st.experimental_rerun()  # Redirect to news page after sign-up
         else:
             st.error("Please fill out all fields.")
 
 # Login function
 def login():
     st.header("Login")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+    email = st.text_input("Email", key="login_email")
+    password = st.text_input("Password", type="password", key="login_password")
     captcha_input = st.text_input("Enter CAPTCHA")
 
     if 'captcha_text' not in st.session_state:
@@ -80,8 +80,8 @@ def login():
             if user:
                 st.session_state.logged_in = True
                 st.session_state.email = user["email"]
-                st.experimental_set_query_params(page="news")  # Redirect to news page
-                st.experimental_rerun()
+                st.success("Login successful!")
+                st.experimental_rerun()  # Redirect to news page after login
             else:
                 st.error("Invalid email or password.")
         else:
@@ -89,16 +89,26 @@ def login():
 
 # Main function
 def main():
+    st.title("News App")
     init_session_state()
 
     if not st.session_state.logged_in:
         if st.session_state.show_signup:
             signup()
+            if st.button("Go to Login"):
+                st.session_state.show_signup = False
+                st.experimental_rerun()
         else:
             login()
+            if st.button("Go to Sign Up"):
+                st.session_state.show_signup = True
+                st.experimental_rerun()
     else:
-        st.experimental_set_query_params(page="news")  # Redirect to news page
-        st.experimental_rerun()
+        st.header("Welcome to the News App")
+        st.write("[Go to News](news.py)")
+        if st.button("Logout"):
+            st.session_state.logged_in = False
+            st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
