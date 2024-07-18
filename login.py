@@ -43,14 +43,22 @@ def generate_captcha():
 # Signup function
 def signup():
     st.header("Sign Up")
+    
+    # Add country selection to the signup form
+    
     email = st.text_input("Email", key="signup_email")
     password = st.text_input("Password", type="password", key="signup_password")
+
+    countries = ["Brazil", "Dubai", "Saudi", "China"]
+    country = st.selectbox("Select Country", countries, key="signup_country")
+    
     if st.button("Sign Up"):
-        if email and password:
-            user = {"email": email, "password": password}
+        if email and password and country:
+            user = {"email": email, "password": password, "country": country}
             users_collection.insert_one(user)
             st.session_state.logged_in = True
             st.session_state.email = email
+            st.session_state.country = country
             st.success("Sign-up successful!")
             st.experimental_rerun()  # Redirect to news page after sign-up
         else:
@@ -80,6 +88,7 @@ def login():
             if user:
                 st.session_state.logged_in = True
                 st.session_state.email = user["email"]
+                st.session_state.country = user.get("country", "")  # Store the country info if available
                 st.success("Login successful!")
                 st.experimental_rerun()  # Redirect to news page after login
             else:
@@ -108,7 +117,9 @@ def main():
         st.write("[Go to News](news.py)")
         if st.button("Logout"):
             st.session_state.logged_in = False
+            st.session_state.country = ""  # Clear country info on logout
             st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
+
