@@ -3,6 +3,7 @@ import requests
 from newspaper import Article
 from llama_index.llms.groq import Groq
 from datetime import datetime
+from groq import Groq
 from pymongo import MongoClient, errors
 
 # Groq API Key
